@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Users - Password-Authenticated Key Exchange</title>
-    <link rel="stylesheet" href="style/style.css">
+    <title>Admin Add Products - Password-Authenticated Key Exchange</title>
+    <link rel="stylesheet" href="../style/style.css">  <!-- Updated path -->
 </head>
 <body>
     <header class="header">
@@ -16,38 +16,60 @@
             </div>
             <h1 class="site-title">Password-Authenticated Key Exchange</h1>
             <p>Admin Dashboard</p>
+            
             <div class="nav-container">
                 <ul class="nav">
-                    <li><a href="admin_addproducts.html">Add Products</a></li>
+                    <li><a href="admin_addproducts.html" class="current">Add Products</a></li>
                     <li><a href="admin_viewproducts.html">View Products</a></li>
-                    <li><a href="admin_viewusers.html" class="current">View Fraud Users</a></li>
-                    <li><a href="index.html">Logout</a></li>
+                    <li><a href="admin_viewusers.html">View Fraud Users</a></li>
+                    <li><a href="../index.html">Logout</a></li>  <!-- Updated path -->
                 </ul>
             </div>
         </div>
         <div class="animated-wave"></div>
     </header>
 
-    <main class="users-container">
-        <h2 class="page-title">View User Details</h2>
-        <table class="users-table">
-            <thead>
-                <tr>
-                    <th>User Name</th>
-                    <th>Gender</th>
-                    <th>DOB</th>
-                    <th>Mobile No</th>
-                    <th>Email</th>
-                    <th>Address</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="usersTableBody">
-                <!-- User data will be populated here by JavaScript -->
-            </tbody>
-        </table>
+    <main class="main-content">
+        <div class="product-form-container reveal active">
+            <h2 class="product-form-title">Upload Products</h2>
+            
+            <div id="alertSuccess" class="alert alert-success">
+                Product added successfully!
+            </div>
+            
+            <form id="productForm" action="admin_addproductsact.jsp" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="pname">Product Name</label>
+                    <input type="text" class="form-control" id="pname" name="pname" placeholder="Enter product name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pquantity">Quantity</label>
+                    <input type="number" class="form-control" id="pquantity" name="pquantity" placeholder="Enter quantity" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pdes">Description</label>
+                    <textarea class="form-control" id="pdes" name="pdes" placeholder="Enter product description" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pprice">Price</label>
+                    <input type="number" class="form-control" id="pprice" name="pprice" placeholder="Enter price" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">Product Image</label>
+                    <div class="upload-btn-wrapper">
+                        <input type="file" class="form-control file-input" id="image" name="image" accept="image/*" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">Upload Product</button>
+            </form>
+        </div>
     </main>
+
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-links">
@@ -76,63 +98,47 @@
             <p class="copyright">© 2025 Password-Authenticated Key Exchange. All rights reserved.</p>
         </div>
     </footer>
+
+
     <script>
-    // Sample user data (replace with actual data fetching)
-    const users = [
-        {
-            username: "John Doe",
-            gender: "Male",
-            dob: "1990-01-01",
-            mobile: "1234567890",
-            email: "john@example.com",
-            address: "123 Main St",
-            status: "Active"
-        },
-        {
-            username: "Jane Smith",
-            gender: "Female",
-            dob: "1992-05-15",
-            mobile: "9876543210",
-            email: "jane@example.com",
-            address: "456 Oak Ave",
-            status: "Blocked"
-        }
-    ];
-
-    function populateUsersTable() {
-        const tableBody = document.getElementById('usersTableBody');
-        tableBody.innerHTML = ''; // Clear existing content
-        
-        users.forEach(user => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${user.username}</td>
-                <td>${user.gender}</td>
-                <td>${user.dob}</td>
-                <td>${user.mobile}</td>
-                <td>${user.email}</td>
-                <td>${user.address}</td>
-                <td><span class="status-badge ${user.status.toLowerCase() === 'active' ? 'status-active' : 'status-blocked'}">${user.status}</span></td>
-                <td>
-                    <a href="#" class="block-btn" onclick="blockUser('${user.email}')">
-                        ${user.status === 'Active' ? 'Block' : 'Unblock'}
-                    </a>
-                </td>
-            `;
-            tableBody.appendChild(row);
+        // Check for URL parameters to show alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('msg')) {
+                document.getElementById('alertSuccess').style.display = 'block';
+                setTimeout(function() {
+                    document.getElementById('alertSuccess').style.display = 'none';
+                }, 5000);
+            }
         });
-    }
 
-    function blockUser(email) {
-        // Find user and toggle status
-        const user = users.find(u => u.email === email);
-        if (user) {
-            user.status = user.status === 'Active' ? 'Blocked' : 'Active';
-            populateUsersTable(); // Refresh table
-        }
-    }
+        // Form validation
+        document.getElementById('productForm').addEventListener('submit', function(event) {
+            const pname = document.getElementById('pname').value.trim();
+            const pquantity = document.getElementById('pquantity').value.trim();
+            const pprice = document.getElementById('pprice').value.trim();
+            
+            if (!pname || !pquantity || !pprice) {
+                event.preventDefault();
+                alert('Please fill in all required fields');
+            }
+        });
 
-    document.addEventListener('DOMContentLoaded', populateUsersTable);
-</script>
+        // Scroll reveal animation
+        window.addEventListener('scroll', function() {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add('active');
+                }
+            }
+        });
+    </script>
 </body>
 </html>

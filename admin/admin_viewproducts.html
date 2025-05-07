@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Password-Authenticated Key Exchange</title>
-    <link rel="stylesheet" href="style/style.css">
+    <title>View Products - Password-Authenticated Key Exchange</title>
+    <link rel="stylesheet" href="../style/style.css">  <!-- Updated path -->
 </head>
 <body>
     <header class="header">
@@ -15,50 +15,35 @@
                 </svg>
             </div>
             <h1 class="site-title">Password-Authenticated Key Exchange</h1>
-            <p>For Fast and Safer Online Authentication</p>
-            
+            <p>Admin Dashboard</p>
             <div class="nav-container">
                 <ul class="nav">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="admin.html" class="current">Admin</a></li>
-                    <li><a href="user.html">User</a></li>
-                    <li><a href="server.html">Server</a></li>
+                    <li><a href="admin_addproducts.html">Add Products</a></li>
+                    <li><a href="admin_viewproducts.html" class="current">View Products</a></li>
+                    <li><a href="admin_viewusers.html">View Fraud Users</a></li>
+                    <li><a href="../index.html">Logout</a></li>  <!-- Updated path -->
                 </ul>
             </div>
         </div>
         <div class="animated-wave"></div>
     </header>
 
-    <main class="main-content">
-        <div class="login-container reveal">
-            <h2 class="login-title">Welcome to the Admin Panel</h2>
-            <p>Please log in to access the admin features.</p>
-        </div>
-        <div class="login-container reveal active">
-            <h2 class="login-title">Admin Login</h2>
-            
-            <div id="alertSuccess" class="alert alert-success">
-                Login Successful!
-            </div>
-            
-            <div id="alertDanger" class="alert alert-danger">
-                Login Failed. Please check your credentials.
-            </div>
-            
-            <form id="adminLoginForm" action="admin_act.jsp" method="post">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
-                </div>
-                
-                <button type="submit" class="btn">Login</button>
-            </form>
-        </div>
+    <main class="products-container">
+        <h2 class="page-title">View Products</h2>
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody id="productsTableBody">
+                <!-- Product rows will be inserted here by JavaScript -->
+            </tbody>
+        </table>
     </main>
 
     <footer class="footer">
@@ -89,59 +74,42 @@
             <p class="copyright">© 2025 Password-Authenticated Key Exchange. All rights reserved.</p>
         </div>
     </footer>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check URL parameters for success/failure messages
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            if (urlParams.has('m1')) {
-                document.getElementById('alertSuccess').style.display = 'block';
-                
-                setTimeout(function() {
-                    document.getElementById('alertSuccess').style.display = 'none';
-                }, 5000);
+        // Sample product data (replace with your actual data source)
+        const products = [
+            {
+                name: "Product 1",
+                description: "Description for product 1",
+                quantity: 10,
+                price: "$99.99",
+                image: "product1.jpg"
+            },
+            {
+                name: "Product 2",
+                description: "Description for product 2",
+                quantity: 15,
+                price: "$149.99",
+                image: "product2.jpg"
             }
+        ];
+
+        function populateProductsTable() {
+            const tableBody = document.getElementById('productsTableBody');
             
-            if (urlParams.has('m2')) {
-                document.getElementById('alertDanger').style.display = 'block';
-                
-                setTimeout(function() {
-                    document.getElementById('alertDanger').style.display = 'none';
-                }, 5000);
-            }
-            
-            // Form validation
-            document.getElementById('adminLoginForm').addEventListener('submit', function(event) {
-                const username = document.getElementById('username').value.trim();
-                const password = document.getElementById('password').value.trim();
-                
-                if (!username || !password) {
-                    event.preventDefault();
-                    document.getElementById('alertDanger').textContent = 'Username and password are required.';
-                    document.getElementById('alertDanger').style.display = 'block';
-                    
-                    setTimeout(function() {
-                        document.getElementById('alertDanger').style.display = 'none';
-                    }, 5000);
-                }
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.description}</td>
+                    <td>${product.quantity}</td>
+                    <td>${product.price}</td>
+                    <td><img src="Gallery/${product.image}" alt="${product.name}" class="product-image"></td>
+                `;
+                tableBody.appendChild(row);
             });
-            
-            // Scroll reveal animation
-            window.addEventListener('scroll', function() {
-                const reveals = document.querySelectorAll('.reveal');
-                
-                for (let i = 0; i < reveals.length; i++) {
-                    const windowHeight = window.innerHeight;
-                    const elementTop = reveals[i].getBoundingClientRect().top;
-                    const elementVisible = 150;
-                    
-                    if (elementTop < windowHeight - elementVisible) {
-                        reveals[i].classList.add('active');
-                    }
-                }
-            });
-        });
+        }
+
+        document.addEventListener('DOMContentLoaded', populateProductsTable);
     </script>
 </body>
 </html>
