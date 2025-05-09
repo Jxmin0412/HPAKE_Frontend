@@ -1,10 +1,11 @@
+<!--user.html-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration - Password-Authenticated Key Exchange</title>
-    <link rel="stylesheet" href="style/style.css">
+    <title>User Login - Password-Authenticated Key Exchange</title>
+    <link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
     <header class="header">
@@ -19,10 +20,10 @@
             
             <div class="nav-container">
                 <ul class="nav">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="/admin/admin.html">Admin</a></li>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../admin/admin.html">Admin</a></li>
                     <li><a href="user.html" class="current">User</a></li>
-                    <li><a href="server/server.html">Server</a></li>
+                    <li><a href="../server/server.html">Server</a></li>
                 </ul>
             </div>
         </div>
@@ -30,21 +31,18 @@
     </header>
 
     <main class="main-content">
-        
-
-
-        <div class="registration-container reveal active">
-            <h2 class="registration-title">User Registration</h2>
+        <div class="login-container reveal active">
+            <h2 class="login-title">User Login</h2>
             
             <div id="alertSuccess" class="alert alert-success">
                 User registered successfully!
             </div>
             
             <div id="alertDanger" class="alert alert-danger">
-                Registration failed. Please check your details.
+                Login failed. Please check your credentials.
             </div>
             
-            <form id="registrationForm" action="Upload" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <form id="loginForm" action="Login" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
@@ -56,50 +54,26 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="gender">Gender</label>
-                    <select class="form-select" id="gender" name="gen" required>
-                        <option value="">--Select--</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="dob">Date of Birth</label>
-                    <input type="date" class="form-control" id="dob" name="dt">
-                </div>
-                
-                <div class="form-group">
-                    <label for="mobile">Mobile Number</label>
-                    <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="address">Address</label>
-                    <input type="text" class="form-control" id="address" name="address" placeholder="Enter your address" required>
-                </div>
-                
-                <div class="form-group">
                     <label for="filename">Filename</label>
-                    <input type="text" class="form-control" id="filename" name="filename" placeholder="Enter filename" required>
+                    <input type="text" class="form-control" id="filename" name="filename" placeholder="Enter filename">
+                </div>
+                
+                <div class="form-group">
+                    <label for="skey">Secret Key</label>
+                    <input type="text" class="form-control" id="skey" name="skey" placeholder="Enter your secret key">
                 </div>
                 
                 <div class="form-group">
                     <label for="file">Upload File</label>
                     <div class="upload-btn-wrapper">
-                        <input type="file" class="form-control file-input" id="file" name="file" required>
+                        <input type="file" class="form-control file-input" id="file" name="file">
                     </div>
                 </div>
                 
-                <button type="submit" class="btn">Register</button>
+                <button type="submit" class="btn">Login</button>
                 
-                <div class="login-link">
-                    <p>Already have an account? <a href="user.html">Login</a></p>
+                <div class="signup-link">
+                    <p>Don't have an account? <a href="userreg.html">Sign Up</a></p>
                 </div>
             </form>
         </div>
@@ -130,7 +104,7 @@
                     </svg>
                 </a>
             </div>
-            <p class="copyright">© 2025  Password-Authenticated Key Exchange. All rights reserved.</p>
+            <p class="copyright">© 2025 Password-Authenticated Key Exchange. All rights reserved.</p>
         </div>
     </footer>
 
@@ -150,50 +124,14 @@
                 }, 5000);
             }
             
-            // Check for 'msg1' parameter (registration failed)
+            // Check for 'msg1' parameter (login failed)
             if (urlParams.has('msg1')) {
-                document.getElementById('alertDanger').textContent = 'User already exists!';
                 document.getElementById('alertDanger').style.display = 'block';
                 
                 // Hide after 5 seconds
                 setTimeout(function() {
                     document.getElementById('alertDanger').style.display = 'none';
                 }, 5000);
-            }
-        });
-
-        // Input validation for numbers only
-        function isNumber(evt) {
-            evt = (evt) ? evt : window.event;
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
-            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                return false;
-            }
-            return true;
-        }
-
-        // Form validation
-        function validateForm() {
-            let mobile = document.getElementById('mobile');
-            
-            if (mobile.value === "") {
-                alert("Please enter your Mobile No.");
-                return false;
-            }
-            
-            if (mobile.value.length !== 10) {
-                alert("Mobile No. is not valid, Please Enter 10 Digit Mobile No.");
-                return false;
-            }
-            
-            return true;
-        }
-
-        // File input handling
-        document.getElementById('file').addEventListener('change', function() {
-            const fileName = this.value.split('\\').pop();
-            if (fileName) {
-                document.getElementById('filename').value = fileName;
             }
         });
 
@@ -212,9 +150,28 @@
             }
         });
 
-        // Add event listener for mobile input to only allow numbers
-        document.getElementById('mobile').addEventListener('keypress', function(event) {
-            return isNumber(event);
+        // File input styling
+        document.getElementById('file').addEventListener('change', function() {
+            const fileName = this.value.split('\\').pop();
+            if (fileName) {
+                document.getElementById('filename').value = fileName;
+            }
+        });
+
+        // Form validation
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                event.preventDefault();
+                document.getElementById('alertDanger').textContent = 'Username and password are required.';
+                document.getElementById('alertDanger').style.display = 'block';
+                
+                setTimeout(function() {
+                    document.getElementById('alertDanger').style.display = 'none';
+                }, 5000);
+            }
         });
     </script>
 </body>
