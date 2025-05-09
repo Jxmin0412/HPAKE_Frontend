@@ -1,4 +1,13 @@
+// DOM Elements
+const cardForm = document.getElementById('cardForm');
+const alertSuccess = document.getElementById('alertSuccess');
+const alertDanger = document.getElementById('alertDanger');
+const cardNumber = document.getElementById('cardNumber');
+
+// Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
+    checkUrlParams();
+
     // Parse URL parameters to show alerts
     const urlParams = new URLSearchParams(window.location.search);
     
@@ -63,6 +72,59 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+cardNumber.addEventListener('keypress', isNumber);
+cardForm.addEventListener('submit', handleFormSubmit);
+
+// Check URL parameters for success/failure messages
+function checkUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.has('msg')) {
+        showAlert(alertSuccess);
+    }
+    
+    if (urlParams.has('msg1')) {
+        showAlert(alertDanger);
+    }
+}
+
+// Show alert and hide after 5 seconds
+function showAlert(alertElement) {
+    alertElement.style.display = 'block';
+    setTimeout(() => {
+        alertElement.style.display = 'none';
+    }, 5000);
+}
+
+// Input validation for numbers only
+function isNumber(evt) {
+    evt = evt || window.event;
+    const charCode = evt.which || evt.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        evt.preventDefault();
+        return false;
+    }
+    return true;
+}
+
+// Form validation and submission
+function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    if (cardNumber.value === "") {
+        alert("Please enter your Card Number");
+        return false;
+    }
+    
+    if (cardNumber.value.length !== 16) {
+        alert("Card Number is not valid. Please enter a 16-digit Card Number.");
+        return false;
+    }
+    
+    // If validation passes, submit the form
+    this.submit();
+}
+
 // Function to populate users table with mock data
 function populateUsersTable() {
     const mockData = [
@@ -126,13 +188,11 @@ async function sendKey(email, key) {
     }
 }
 
-// Function to show alert message
-function showAlert(alertId) {
-    const alert = document.getElementById(alertId);
-    if (!alert) return;
-
-    alert.style.display = 'block';
-    setTimeout(() => {
-        alert.style.display = 'none';
-    }, 5000);
+// Export functions for testing if needed
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        isNumber,
+        handleFormSubmit,
+        showAlert
+    };
 }

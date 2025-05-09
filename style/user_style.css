@@ -1,0 +1,390 @@
+/* Card Details specific styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.card-details-section {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin: 2rem auto;
+    opacity: 1;
+    visibility: visible;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.action-button {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    text-align: center;
+}
+
+.action-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.section-title {
+    text-align: center;
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Animation for reveal class */
+.reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s ease;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Card Details styles */
+.card-info {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-info .no-card-message {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.card-item {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-item h3 {
+    margin: 0 0 1rem 0;
+    color: #333;
+}
+
+.card-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.card-detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    font-weight: 500;
+    color: #333;
+}
+/* Card form specific styles */
+.card-form-section {
+    padding: 40px 0;
+}
+
+.card-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: var(--light-color);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+}
+
+.card-form-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+.form-title {
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 28px;
+    margin-bottom: 30px;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.form-title:after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -10px;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+/* Add Money specific styles */
+.add-money-section {
+    padding: 40px 0;
+}
+
+.add-money-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: var(--light-color);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--box-shadow);
+}
+
+.add-money-form {
+    margin-top: 30px;
+}
+
+.add-money-form .form-group {
+    margin-bottom: 25px;
+}
+
+#cardNumber {
+    letter-spacing: 1px;
+}
+
+#cvv {
+    -webkit-text-security: disc;
+    /*text-security: disc;*/
+}
+
+#expiryDate {
+    width: 120px;
+}
+
+#amount {
+    width: 200px;
+}
+
+/* View Money specific styles */
+.view-money-section {
+    padding: 2rem;
+}
+
+.view-money-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+.card-details-table {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 2rem;
+}
+
+.card-details-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.card-details-table th,
+.card-details-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.card-details-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    color: #333;
+}
+
+.card-details-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Products Section Styles */
+.products-section {
+    padding: 2rem;
+    background-color: #f5f5f5;
+}
+
+.products-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.product-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.product-details {
+    padding: 1rem 0;
+}
+
+.product-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.product-description {
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.product-price {
+    font-weight: bold;
+    color: #24f0c9;
+    margin-bottom: 1rem;
+}
+
+.purchase-btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #0d637d;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.purchase-btn:hover {
+    background-color: #094857;
+}
+
+/* Purchase Form Styles */
+.purchase-section {
+    padding: 2rem;
+    background-color: #f5f5f5;
+}
+
+.purchase-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.purchase-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group input[readonly] {
+    background-color: #f5f5f5;
+}
+
+.submit-btn {
+    padding: 1rem 2rem;
+    background-color: #24f0c9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #1cd1ae;
+}
+
+/* Payment Form Field Styles */
+.form-group input[type="text"],
+.form-group input[type="password"] {
+    padding: 0.75rem;
+    height: 30px;
+    width: 170px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #24f0c9;
+    box-shadow: 0 0 0 2px rgba(36, 240, 201, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #999;
+}
+
+.form-group input:invalid {
+    border-color: #ff6b6b;
+}
