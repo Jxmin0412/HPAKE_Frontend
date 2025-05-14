@@ -172,6 +172,12 @@
     margin-bottom: 25px;
 }
 
+.CardHolderName {
+    width: 200px;
+    padding: 5px;
+    margin: 5px;
+}
+
 #cardNumber {
     letter-spacing: 1px;
 }
@@ -189,48 +195,7 @@
     width: 200px;
 }
 
-/* View Money specific styles */
-.view-money-section {
-    padding: 2rem;
-}
 
-.view-money-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
-}
-
-.card-details-table {
-    width: 100%;
-    overflow-x: auto;
-    margin-top: 2rem;
-}
-
-.card-details-table table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-.card-details-table th,
-.card-details-table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.card-details-table th {
-    background-color: #f5f5f5;
-    font-weight: 600;
-    color: #333;
-}
-
-.card-details-table tr:hover {
-    background-color: #f9f9f9;
-}
 
 /* Products Section Styles */
 .products-section {

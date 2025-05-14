@@ -1,338 +1,235 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Sample data - replace with actual data from your backend
-    const cards = [
-        {
-            id: 1,
-            cardNumber: '**** **** **** 1234',
-            cardHolder: 'John Doe',
-            expiryDate: '12/25',
-            balance: '$5,000'
-        }
-    ];
+// Utility functions
+const showAlert = (type, message) => {
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertDanger = document.getElementById('alertDanger');
 
-    const cardInfo = document.getElementById('cardInfo');
-
-    if (cards.length > 0) {
-        cardInfo.innerHTML = cards.map(card => `
-            <div class="card-item">
-                <h3>Card Information</h3>
-                <div class="card-details">
-                    <div class="card-detail-item">
-                        <span class="detail-label">Card Number</span>
-                        <span class="detail-value">${card.cardNumber}</span>
-                    </div>
-                    <div class="card-detail-item">
-                        <span class="detail-label">Card Holder</span>
-                        <span class="detail-value">${card.cardHolder}</span>
-                    </div>
-                    <div class="card-detail-item">
-                        <span class="detail-label">Expiry Date</span>
-                        <span class="detail-value">${card.expiryDate}</span>
-                    </div>
-                    <div class="card-detail-item">
-                        <span class="detail-label">Current Balance</span>
-                        <span class="detail-value">${card.balance}</span>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+    if (type === 'success') {
+        alertSuccess.textContent = message;
+        alertSuccess.style.display = 'block';
+        alertDanger.style.display = 'none';
+    } else {
+        alertDanger.textContent = message;
+        alertDanger.style.display = 'block';
+        alertSuccess.style.display = 'none';
     }
+};
 
-    // Handle success/error alerts
-    const urlParams = new URLSearchParams(window.location.search);
-    const successAlert = document.getElementById('alertSuccess');
-    const dangerAlert = document.getElementById('alertDanger');
-
-    if (urlParams.has('success')) {
-        successAlert.style.display = 'block';
-        setTimeout(() => successAlert.style.display = 'none', 3000);
-    }
-
-    if (urlParams.has('error')) {
-        dangerAlert.style.display = 'block';
-        setTimeout(() => dangerAlert.style.display = 'none', 3000);
-    }
-
-    // Initial check for reveal elements
-    checkReveal();
-    
-    // Check for reveal elements on scroll
-    window.addEventListener('scroll', checkReveal);
-
-    // Add Money Form Handling
-    const addMoneyForm = document.getElementById('addMoneyForm');
-    if (addMoneyForm) {
-        // Load card holder name from localStorage or session
-        const cardHolderName = document.getElementById('cardHolderName');
-        if (localStorage.getItem('userName')) {
-            cardHolderName.value = localStorage.getItem('userName');
-        }
-
-        // Card number formatting and validation
-        const cardNumber = document.getElementById('cardNumber');
-        cardNumber.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 16) value = value.slice(0, 16);
-            e.target.value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-        });
-
-        // CVV validation
-        const cvv = document.getElementById('cvv');
-        cvv.addEventListener('input', function(e) {
-            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 3);
-        });
-
-        // Expiry date formatting and validation
-        const expiryDate = document.getElementById('expiryDate');
-        expiryDate.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 4) value = value.slice(0, 4);
-            if (value.length > 2) {
-                value = value.slice(0, 2) + '/' + value.slice(2);
-            }
-            e.target.value = value;
-        });
-
-        // Amount validation
-        const amount = document.getElementById('amount');
-        amount.addEventListener('input', function(e) {
-            e.target.value = e.target.value.replace(/[^\d.]/g, '');
-        });
-
-        // Form submission
-        addMoneyForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Basic validation
-            if (!validateForm()) return;
-
-            // Here you would typically make an API call to your backend
-            // For demo, we'll just show success message
-            document.getElementById('alertSuccess').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('alertSuccess').style.display = 'none';
-                // Redirect after successful addition
-                window.location.href = 'user_card.html';
-            }, 2000);
-        });
-
-        function validateForm() {
-            const cardNum = cardNumber.value.replace(/\s/g, '');
-            if (cardNum.length !== 16) {
-                showError('Please enter a valid 16-digit card number');
-                return false;
-            }
-
-            if (cvv.value.length !== 3) {
-                showError('Please enter a valid 3-digit CVV');
-                return false;
-            }
-
-            const today = new Date();
-            const [month, year] = expiryDate.value.split('/');
-            if (!month || !year || month > 12 || 
-                new Date(2000 + parseInt(year), month - 1) < today) {
-                showError('Please enter a valid expiry date');
-                return false;
-            }
-
-            if (!amount.value || parseFloat(amount.value) <= 0) {
-                showError('Please enter a valid amount');
-                return false;
-            }
-
-            return true;
-        }
-
-        function showError(message) {
-            const alertDanger = document.getElementById('alertDanger');
-            alertDanger.textContent = message;
-            alertDanger.style.display = 'block';
-            setTimeout(() => {
-                alertDanger.style.display = 'none';
-            }, 3000);
-        }
-    }
-});
-
-// Function to show alert messages
-function showAlert(alertId) {
-    const alert = document.getElementById(alertId);
-    if (!alert) return;
-    
-    alert.style.display = 'block';
-    
-    // Hide alert after 5 seconds
+const redirect = (url, delay = 2000) => {
     setTimeout(() => {
-        alert.style.display = 'none';
-    }, 5000);
-}
+        window.location.href = url;
+    }, delay);
+};
 
-function checkReveal() {
-    const reveals = document.querySelectorAll('.reveal');
-    
-    reveals.forEach(element => {
-        const windowHeight = window.innerHeight;
-        const elementTop = element.getBoundingClientRect().top;
-        const elementVisible = 150;
-        
-        if (elementTop < windowHeight - elementVisible) {
-            element.classList.add('active');
-        }
-    });
-}
+// User Registration
+const handleRegistration = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
 
-// Function to fetch and display card money details
-async function loadCardMoneyDetails() {
     try {
-        // In a real application, this would be an API call
-        // For demo purposes, we'll use mock data
-        const mockData = {
-            cardHolder: localStorage.getItem('username') || 'John Doe',
-            cardNumber: '4***********1234',
-            balance: '5000.00'
-        };
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            body: formData
+        });
 
-        const tableBody = document.getElementById('moneyTableBody');
-        if (tableBody) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td>${mockData.cardHolder}</td>
-                    <td>${mockData.cardNumber}</td>
-                    <td>$${mockData.balance}</td>
-                </tr>
-            `;
+        const data = await response.json();
+
+        if (response.ok) {
+            showAlert('success', 'Registration successful! Check your email for the secret key.');
+            redirect('user.html');
+        } else {
+            showAlert('error', data.message);
         }
     } catch (error) {
-        console.error('Error loading card money details:', error);
+        showAlert('error', 'An error occurred during registration.');
+        console.error('Registration error:', error);
     }
+};
+
+// User Login
+const handleLogin = async (event) => {
+    event.preventDefault();
+
+    const formData = {
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value,
+        secretKey: document.getElementById('secretKey').value
+    };
+
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            showAlert('success', 'Login successful!');
+            redirect('user_card.html');
+        } else {
+            showAlert('error', data.message);
+        }
+    } catch (error) {
+        showAlert('error', 'An error occurred during login.');
+        console.error('Login error:', error);
+    }
+};
+
+// Add Card
+const handleAddCard = async (event) => {
+    event.preventDefault();
+
+    const formData = {
+        cardHolderName: document.getElementById('cardName').value,
+        cardNumber: document.getElementById('cardNumber').value,
+        cvv: document.getElementById('cvv').value,
+        expiryDate: document.getElementById('expiryDate').value
+    };
+
+    try {
+        const response = await fetch('/api/cards/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showAlert('success', 'Card added successfully!');
+            event.target.reset();
+            redirect('user_card.html');
+        } else {
+            showAlert('error', data.message);
+        }
+    } catch (error) {
+        showAlert('error', 'An error occurred while adding the card.');
+        console.error('Add card error:', error);
+    }
+};
+
+// Load Card Details
+// ...existing code...
+
+const loadCardDetails = async () => {
+    const cardDetailsSection = document.querySelector('.card-info');
+    if (!cardDetailsSection) return;
+
+    try {
+        const response = await fetch('/api/cards/user');
+        const data = await response.json();
+
+        if (data.success && data.cards && data.cards.length > 0) {
+            const cardsHtml = data.cards.map(card => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        
+                        <div class="card-info">
+                            <p><strong>Card Holder:</strong> ${card.cardHolderName}</p>
+                            <p><strong>Card Number:</strong> ${maskCardNumber(card.cardNumber)}</p>
+                            <p><strong>Expiry Date:</strong> ${card.expiryDate}</p>
+                            <p><strong>Balance:</strong> $${card.balance.toFixed(2)}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            cardDetailsSection.innerHTML = cardsHtml;
+        } else {
+            cardDetailsSection.innerHTML = '<div class="alert alert-info">No cards found</div>';
+        }
+    } catch (error) {
+        console.error('Error loading card details:', error);
+        cardDetailsSection.innerHTML = '<div class="alert alert-danger">Error loading card details</div>';
+    }
+};
+
+const maskCardNumber = (cardNumber) => {
+    return `****${cardNumber.slice(-4)}`;
+};
+
+function addMoney(event) {
+    event.preventDefault();
+
+    const formData = {
+        cardNumber: document.getElementById('cardNumber').value,
+        cardHolderName: document.getElementById('cardHolderName').value,
+        cvv: document.getElementById('cvv').value,
+        expiryDate: document.getElementById('expiryDate').value,
+        amount: parseFloat(document.getElementById('amount').value)
+    };
+
+    fetch('/api/money/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', 'Money added successfully!');
+                // Update the balance in the cards list
+                updateCardBalance(data.card);
+                // Clear the form
+                document.getElementById('addMoneyForm').reset();
+            } else {
+                showAlert('error',data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to add money. Please try again.');
+        });
 }
 
-// Load card money details when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.location.href.includes('user_viewmoney.html')) {
-        loadCardMoneyDetails();
-    }
-});
+function updateCardBalance(updatedCard) {
+    // Get all card elements
+    const cardElements = document.querySelectorAll('.card-info');
 
-// Sample product data (replace with actual data from your backend)
-const products = [
-    {
-        id: 1,
-        name: "Sample Product 1",
-        description: "Product description here",
-        quantity: 10,
-        price: 99.99,
-        image: "product1.jpg"
-    },
-    // Add more products as needed
-];
-
-// Function to display products
-function displayProducts() {
-    const productsGrid = document.getElementById('productsGrid');
-    if (!productsGrid) return;
-
-    productsGrid.innerHTML = '';
-
-    products.forEach(product => {
-        const productCard = `
-            <div class="product-card">
-                <img src="../Gallery/${product.image}" alt="${product.name}" class="product-image">
-                <div class="product-details">
-                    <h3 class="product-name">${product.name}</h3>
-                    <p class="product-description">${product.description}</p>
-                    <p>Quantity: ${product.quantity}</p>
-                    <p class="product-price">$${product.price}</p>
-                    <a href="user_products1.html?id=${product.id}" class="purchase-btn">Purchase</a>
-                </div>
-            </div>
-        `;
-        productsGrid.innerHTML += productCard;
+    // Find the card element that contains the matching card number
+    cardElements.forEach(cardElement => {
+        const cardNumberElement = cardElement.querySelector('.card-text');
+        if (cardNumberElement && cardNumberElement.textContent.includes(updatedCard.cardNumber)) {
+            // Find and update the balance element
+            const balanceElement = cardElement.querySelector('.card-text:last-child');
+            if (balanceElement) {
+                balanceElement.textContent = `Balance: $${updatedCard.balance.toFixed(2)}`;
+            }
+        }
     });
 }
-
-// Initialize products when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    displayProducts();
-});
-
-// Show success message if URL contains success parameter
-if (new URLSearchParams(window.location.search).get('msg')) {
-    alert('User Login Successfully');
-}
-
-// Show error message if URL contains error parameter
-if (new URLSearchParams(window.location.search).get('msg1')) {
-    alert('Login Failed');
-}
-
-// Function to populate purchase form with product details
-function populatePurchaseForm() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
-    const productName = urlParams.get('pname');
-    const productDesc = urlParams.get('pdes');
-    const productPrice = urlParams.get('pprice');
-
-    if (document.getElementById('purchaseForm')) {
-        document.getElementById('productId').value = productId;
-        document.getElementById('productName').value = productName;
-        document.getElementById('productDesc').value = productDesc;
-        document.getElementById('productPrice').value = productPrice;
-    }
-}
-
-// Handle purchase form submission
-function handlePurchaseSubmit(event) {
-    if (event.target.id === 'purchaseForm') {
-        event.preventDefault();
-        
-        const formData = new FormData(event.target);
-        const quantity = formData.get('quan');
-        
-        if (!quantity) {
-            alert('Please select a quantity');
-            return;
+// Page Load Handler
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get current page
+        const currentPage = window.location.pathname.split('/').pop();
+        if (currentPage === 'user_card.html') {
+            loadCardDetails();
         }
 
-        // Here you would typically make an API call to process the purchase
-        // For now, we'll simulate with a redirect
-        window.location.href = 'user_products2.html?' + new URLSearchParams(formData).toString();
-    }
-}
+        // Add event listeners based on current page
+        switch (currentPage) {
+            case 'userreg.html':
+                document.getElementById('registrationForm')?.addEventListener('submit', handleRegistration);
+                break;
 
-// Add event listeners when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    populatePurchaseForm();
-    
-    const purchaseForm = document.getElementById('purchaseForm');
-    if (purchaseForm) {
-        purchaseForm.addEventListener('submit', handlePurchaseSubmit);
-    }
+            case 'user.html':
+                document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+                break;
 
-    const quantitySelect = document.getElementById('quantity');
-    if (quantitySelect) {
-        quantitySelect.addEventListener('change', calculateTotal);
-    }
+            case 'user_addcard.html':
+                document.getElementById('cardForm')?.addEventListener('submit', handleAddCard);
+                break;
 
-    const expiryDate = document.getElementById('expiryDate');
-    if (expiryDate) {
-        expiryDate.addEventListener('input', (e) => formatExpiryDate(e.target));
-    }
-});
+            case 'user_addmoney.html':
+                document.getElementById('addMoneyForm')?.addEventListener('submit', addMoney);
+                break;
 
-function calculateTotal() {
-    const price = parseFloat(document.getElementById('productPrice').value) || 0;
-    const quantity = parseInt(document.getElementById('quantity').value) || 0;
-    const total = price * quantity;
-    document.getElementById('totalCost').value = total.toFixed(2);
-}
+        }
 
-function formatExpiryDate(input) {
-    let value = input.value.replace(/\D/g, '');
-    if (value.length >= 2) {
-        value = value.slice(0, 2) + '/' + value.slice(2);
-    }
-    input.value = value;
-}
+    });

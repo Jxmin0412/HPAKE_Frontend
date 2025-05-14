@@ -57,10 +57,10 @@
                     <label for="filename">Filename</label>
                     <input type="text" class="form-control" id="filename" name="filename" placeholder="Enter filename">
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="skey">Secret Key</label>
-                    <input type="text" class="form-control" id="skey" name="skey" placeholder="Enter your secret key">
+                    <label for="secretKey">Secret Key</label>
+                    <input type="text" class="form-control" id="secretKey" required>
                 </div>
                 
                 <div class="form-group">
@@ -109,68 +109,47 @@
     </footer>
 
     <script>
-        // Check for URL parameters to show alerts
-        document.addEventListener('DOMContentLoaded', function() {
-            // Parse URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // Check for 'msg' parameter (user registered successfully)
-            if (urlParams.has('msg')) {
-                document.getElementById('alertSuccess').style.display = 'block';
-                
-                // Hide after 5 seconds
-                setTimeout(function() {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                secretKey: document.getElementById('secretKey').value
+            };
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    const alertSuccess = document.getElementById('alertSuccess');
+                    alertSuccess.textContent = data.message;
+                    alertSuccess.style.display = 'block';
+                    document.getElementById('alertDanger').style.display = 'none';
+
+                    setTimeout(() => {
+                        window.location.href = data.redirectUrl;
+                    }, 2000);
+                } else {
+                    const alertDanger = document.getElementById('alertDanger');
+                    alertDanger.textContent = data.message;
+                    alertDanger.style.display = 'block';
                     document.getElementById('alertSuccess').style.display = 'none';
-                }, 5000);
-            }
-            
-            // Check for 'msg1' parameter (login failed)
-            if (urlParams.has('msg1')) {
-                document.getElementById('alertDanger').style.display = 'block';
-                
-                // Hide after 5 seconds
-                setTimeout(function() {
-                    document.getElementById('alertDanger').style.display = 'none';
-                }, 5000);
-            }
-        });
-
-        // Scroll reveal animation
-        window.addEventListener('scroll', function() {
-            const reveals = document.querySelectorAll('.reveal');
-            
-            for (let i = 0; i < reveals.length; i++) {
-                const windowHeight = window.innerHeight;
-                const elementTop = reveals[i].getBoundingClientRect().top;
-                const elementVisible = 150;
-                
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add('active');
                 }
-            }
-        });
-
-        // File input styling
-        document.getElementById('file').addEventListener('change', function() {
-            const fileName = this.value.split('\\').pop();
-            if (fileName) {
-                document.getElementById('filename').value = fileName;
-            }
-        });
-
-        // Form validation
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            
-            if (!username || !password) {
-                event.preventDefault();
-                document.getElementById('alertDanger').textContent = 'Username and password are required.';
-                document.getElementById('alertDanger').style.display = 'block';
-                
-                setTimeout(function() {
-                    document.getElementById('alertDanger').style.display = 'none';
-                }, 5000);
+            } catch (error) {
+                console.error('Error:', error);
+                const alertDanger = document.getElementById('alertDanger');
+                alertDanger.textContent = 'An error occurred. Please try again.';
+                alertDanger.style.display = 'block';
+                document.getElementById('alertSuccess').style.display = 'none';
             }
         });
     </script>

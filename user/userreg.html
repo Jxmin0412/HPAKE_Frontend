@@ -44,7 +44,7 @@
                 Registration failed. Please check your details.
             </div>
             
-            <form id="registrationForm" action="Upload" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <form id="registrationForm" action="/api/register" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
@@ -79,10 +79,6 @@
                     <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
                 </div>
                 
-                <div class="form-group">
-                    <label for="address">Address</label>
-                    <input type="text" class="form-control" id="address" name="address" placeholder="Enter your address" required>
-                </div>
                 
                 <div class="form-group">
                     <label for="filename">Filename</label>
@@ -135,87 +131,48 @@
     </footer>
 
     <script>
-        // Check for URL parameters to show alerts
-        document.addEventListener('DOMContentLoaded', function() {
-            // Parse URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // Check for 'msg' parameter (user registered successfully)
-            if (urlParams.has('msg')) {
-                document.getElementById('alertSuccess').style.display = 'block';
-                
-                // Hide after 5 seconds
-                setTimeout(function() {
-                    document.getElementById('alertSuccess').style.display = 'none';
-                }, 5000);
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                return;
             }
-            
-            // Check for 'msg1' parameter (registration failed)
-            if (urlParams.has('msg1')) {
-                document.getElementById('alertDanger').textContent = 'User already exists!';
-                document.getElementById('alertDanger').style.display = 'block';
-                
-                // Hide after 5 seconds
-                setTimeout(function() {
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('alertSuccess').style.display = 'block';
                     document.getElementById('alertDanger').style.display = 'none';
-                }, 5000);
-            }
-        });
-
-        // Input validation for numbers only
-        function isNumber(evt) {
-            evt = (evt) ? evt : window.event;
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
-            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                return false;
-            }
-            return true;
-        }
-
-        // Form validation
-        function validateForm() {
-            let mobile = document.getElementById('mobile');
-            
-            if (mobile.value === "") {
-                alert("Please enter your Mobile No.");
-                return false;
-            }
-            
-            if (mobile.value.length !== 10) {
-                alert("Mobile No. is not valid, Please Enter 10 Digit Mobile No.");
-                return false;
-            }
-            
-            return true;
-        }
-
-        // File input handling
-        document.getElementById('file').addEventListener('change', function() {
-            const fileName = this.value.split('\\').pop();
-            if (fileName) {
-                document.getElementById('filename').value = fileName;
-            }
-        });
-
-        // Scroll reveal animation
-        window.addEventListener('scroll', function() {
-            const reveals = document.querySelectorAll('.reveal');
-            
-            for (let i = 0; i < reveals.length; i++) {
-                const windowHeight = window.innerHeight;
-                const elementTop = reveals[i].getBoundingClientRect().top;
-                const elementVisible = 150;
-                
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add('active');
+                    
+                    // Wait for 2 seconds before redirecting
+                    setTimeout(() => {
+                        window.location.href = data.redirectUrl;
+                    }, 2000);
+                } else {
+                    document.getElementById('alertDanger').textContent = data.message;
+                    document.getElementById('alertDanger').style.display = 'block';
+                    document.getElementById('alertSuccess').style.display = 'none';
                 }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('alertDanger').textContent = 'An error occurred. Please try again.';
+                document.getElementById('alertDanger').style.display = 'block';
+                document.getElementById('alertSuccess').style.display = 'none';
             }
         });
 
-        // Add event listener for mobile input to only allow numbers
-        document.getElementById('mobile').addEventListener('keypress', function(event) {
-            return isNumber(event);
-        });
+        function validateForm() {
+            // Add any additional validation logic here
+            return true;
+        }
     </script>
 </body>
 </html>
