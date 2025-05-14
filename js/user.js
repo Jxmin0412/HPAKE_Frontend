@@ -174,6 +174,7 @@ function addMoney(event) {
         .then(data => {
             if (data.success) {
                 showAlert('success', 'Money added successfully!');
+                redirect('user_card.html')
                 // Update the balance in the cards list
                 updateCardBalance(data.card);
                 // Clear the form
