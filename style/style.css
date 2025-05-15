@@ -261,7 +261,7 @@ body {
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 15px;
-    color: var (--primary-color);
+    color: var(--primary-color);
 }
 
 .feature-description {
@@ -388,7 +388,7 @@ body {
 
 .alert-success {
     background-color: rgba(35, 209, 96, 0.1);
-    color: var (--success-color);
+    color: var(--success-color);
     border: 1px solid var(--success-color);
 }
 

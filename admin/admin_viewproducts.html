@@ -18,10 +18,10 @@
             <p>Admin Dashboard</p>
             <div class="nav-container">
                 <ul class="nav">
-                    <li><a href="admin_addproducts.html">Add Products</a></li>
+                    <li><a href="admin_addproducts.html">Upload Products</a></li>
                     <li><a href="admin_viewproducts.html" class="current">View Products</a></li>
                     <li><a href="admin_viewusers.html">View Fraud Users</a></li>
-                    <li><a href="../index.html">Logout</a></li>  <!-- Updated path -->
+                    <li><a href="../index.html">Home</a></li>  <!-- Updated path -->
                 </ul>
             </div>
         </div>
@@ -74,42 +74,52 @@
             <p class="copyright">© 2025 Password-Authenticated Key Exchange. All rights reserved.</p>
         </div>
     </footer>
-    <script>
-        // Sample product data (replace with your actual data source)
-        const products = [
-            {
-                name: "Product 1",
-                description: "Description for product 1",
-                quantity: 10,
-                price: "$99.99",
-                image: "product1.jpg"
-            },
-            {
-                name: "Product 2",
-                description: "Description for product 2",
-                quantity: 15,
-                price: "$149.99",
-                image: "product2.jpg"
-            }
-        ];
 
-        function populateProductsTable() {
-            const tableBody = document.getElementById('productsTableBody');
-            
-            products.forEach(product => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>${product.description}</td>
-                    <td>${product.quantity}</td>
-                    <td>${product.price}</td>
-                    <td><img src="Gallery/${product.image}" alt="${product.name}" class="product-image"></td>
-                `;
-                tableBody.appendChild(row);
-            });
+    <script>
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const tableBody = document.getElementById('productsTableBody');
+                tableBody.innerHTML = ''; // Clear previous entries
+
+                data.forEach(product => {
+                    const row = document.createElement('tr');
+
+                    const imageSrc = product.imageBase64
+                        ? `data:image/jpeg;base64,${product.imageBase64}`
+                        : ''; // You can default to a placeholder image if needed
+
+                    row.innerHTML = `
+                <td>${product.name || ''}</td>
+                <td>${product.description || ''}</td>
+                <td>${product.quantity || 0}</td>
+                <td>$${product.price?.toFixed(2) || '0.00'}</td>
+                <td>
+                    ${imageSrc ? `<img src="${imageSrc}" alt="${product.name}" class="product-image" width="100">` : 'No Image'}
+                </td>
+            `;
+
+                    tableBody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Error loading products:', error);
+                const tableBody = document.getElementById('productsTableBody');
+                tableBody.innerHTML = `
+            <tr>
+                <td colspan="5">Error loading products: ${error.message}</td>
+            </tr>`;
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', populateProductsTable);
+        document.addEventListener('DOMContentLoaded', loadProducts);
+
     </script>
+
 </body>
 </html>
