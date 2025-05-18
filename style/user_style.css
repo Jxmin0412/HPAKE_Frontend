@@ -264,7 +264,7 @@
 .purchase-btn {
     display: inline-block;
     padding: 0.5rem 1rem;
-    background-color: #0d637d;
+    background-color: #1011d7;
     color: white;
     text-decoration: none;
     border-radius: 4px;
@@ -272,7 +272,7 @@
 }
 
 .purchase-btn:hover {
-    background-color: #094857;
+    background-color: #1538bd;
 }
 
 /* Purchase Form Styles */
