@@ -45,38 +45,6 @@ const handleRegistration = async (event) => {
     }
 };
 
-// User Login
-const handleLogin = async (event) => {
-    event.preventDefault();
-
-    const formData = {
-        username: document.getElementById('username').value,
-        password: document.getElementById('password').value,
-        secretKey: document.getElementById('secretKey').value
-    };
-
-    try {
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-            showAlert('success', 'Login successful!');
-            redirect('user_card.html');
-        } else {
-            showAlert('error', data.message);
-        }
-    } catch (error) {
-        showAlert('error', 'An error occurred during login.');
-        console.error('Login error:', error);
-    }
-};
 
 // Add Card
 const handleAddCard = async (event) => {
@@ -205,6 +173,160 @@ function updateCardBalance(updatedCard) {
         }
     });
 }
+async function purchaseProduct(productId) {
+    try {
+        // First store the product ID
+        localStorage.setItem('selectedProductId', productId);
+
+        // Make the API call
+        const response = await fetch(`/api/products/purchase/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Redirect to purchase confirmation page
+            window.location.href = 'user_products1.html';
+        } else {
+            showAlert('error', data.message || 'Purchase failed');
+        }
+    } catch (error) {
+        console.error('Error purchasing product:', error);
+        showAlert('error', 'Error occurred while purchasing product');
+    }
+}
+async function handleStoredProduct() {
+    // Get data from URL parameters first
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id') || localStorage.getItem('selectedProductId');
+
+    if (!productId) {
+        window.location.href = 'user_products.html';
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/products/${productId}`);
+        if (!response.ok) {
+            throw new Error('Product not found');
+        }
+
+        const product = await response.json();
+        if (!product) {
+            throw new Error('Product data is empty');
+        }
+
+        // Populate form fields
+        const productIdField = document.getElementById('productId');
+        const productNameField = document.getElementById('productName');
+        const productDescField = document.getElementById('productDesc');
+        const productPriceField = document.getElementById('productPrice');
+        const quantityField = document.getElementById('quantity');
+        const totalCostField = document.getElementById('totalCost');
+        const cardNumberField = document.getElementById('cardNumber');
+        const expiryDateField = document.getElementById('expiryDate');
+        const cvvField = document.getElementById('cvv');
+
+        if (productIdField) productIdField.value = product.id;
+        if (productNameField) productNameField.value = product.name;
+        if (productDescField) productDescField.value = product.description;
+        if (productPriceField) productPriceField.value = product.price.toFixed(2);
+
+        // Handle quantity change and total cost calculation
+        if (quantityField && totalCostField && productPriceField) {
+            // Initial calculation
+            const calculateTotal = () => {
+                const quantity = parseInt(quantityField.value) || 0;
+                const price = parseFloat(productPriceField.value) || 0;
+                totalCostField.value = (quantity * price).toFixed(2);
+            };
+
+            // Calculate initial total
+            calculateTotal();
+
+            // Add event listeners for both input and change events
+            quantityField.addEventListener('input', calculateTotal);
+            quantityField.addEventListener('change', calculateTotal);
+        }
+
+        // Handle form submission
+        const purchaseForm = document.getElementById('purchaseForm');
+        if (purchaseForm) {
+            purchaseForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Validate form data
+                const quantity = parseInt(quantityField.value);
+                if (!quantity || quantity <= 0) {
+                    showAlert('error', 'Please enter a valid quantity');
+                    return;
+                }
+
+                const formData = {
+                    productId: product.id,
+                    quantity: quantity,
+                    totalCost: parseFloat(totalCostField.value),
+                    cardNumber: cardNumberField.value,
+                    expiryDate: expiryDateField.value,
+                    cvv: cvvField.value
+                };
+
+                try {
+                    const response = await fetch('/api/purchase/confirm', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        showAlert('success', 'Purchase successful!');
+                        // Clear localStorage
+                        localStorage.removeItem('selectedProductId');
+                        // Redirect after successful purchase
+                        setTimeout(() => {
+                            window.location.href = 'user_cart.html';
+                        }, 1500);
+                    } else {
+                        showAlert('error', data.message || 'Purchase failed');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showAlert('error', 'Error processing purchase');
+                }
+            });
+        }
+
+    } catch (error) {
+        console.error('Error loading product details:', error);
+        showAlert('error', 'Error loading product details');
+        window.location.href = 'user_products.html';
+    }
+}
+
+// Update your DOMContentLoaded event listener to use handleStoredProduct
+document.addEventListener('DOMContentLoaded', () => {
+    const currentPage = window.location.pathname.split('/').pop();
+
+    // ...existing switch statement code...
+
+    if (currentPage === 'user_products1.html') {
+        handleStoredProduct();
+    }
+});
+
+// Update your existing DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', () => {
+    const currentPage = window.location.pathname.split('/').pop();
+
+});    // Add event listeners based on current page
+
 // Page Load Handler
     document.addEventListener('DOMContentLoaded', () => {
         // Get current page
@@ -233,6 +355,7 @@ function updateCardBalance(updatedCard) {
                         : '';
 
                     row.innerHTML = `
+                <td>${product.id}</td>
                 <td>
                     ${imageSrc ?
                         `<img src="${imageSrc}" alt="${product.name}" class="product-image" style="max-width: 100px;">` :
@@ -257,56 +380,20 @@ function updateCardBalance(updatedCard) {
                 if (!data.length) {
                     productsTable.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align: center;">No products available</td>
+                    <td colspan="7" style="text-align: center;">No products available</td>
                 </tr>`;
                 }
-
             } catch (error) {
                 console.error('Error loading products:', error);
                 productsTable.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; color: red;">
+                <td colspan="7" style="text-align: center; color: red;">
                     Error loading products: ${error.message}
                 </td>
             </tr>`;
                 showAlert('error', 'Failed to load products. Please try again.');
             }
         };
-
-// Add the purchase function
-        const purchaseProduct = async (productId) => {
-            try {
-                const response = await fetch(`/api/products/purchase/${productId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                localStorage.setItem('selectedProductId', productId);
-                // Redirect immediately to user_products1.html
-                window.location.href = 'user_products1.html';
-
-
-                if (data.success) {
-                    showAlert('success', 'Purchase successful!');
-                    loadProducts(); // Reload the products table
-                } else {
-                    showAlert('error', data.message || 'Purchase failed');
-                }
-            } catch (error) {
-                console.error('Error purchasing product:', error);
-                showAlert('error', 'Error occurred while purchasing product');
-            }
-        };
-
-// Update your existing DOMContentLoaded event listener
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentPage = window.location.pathname.split('/').pop();
-
-        });    // Add event listeners based on current page
         switch (currentPage) {
             case 'userreg.html':
                 document.getElementById('registrationForm')?.addEventListener('submit', handleRegistration);
@@ -326,33 +413,30 @@ function updateCardBalance(updatedCard) {
             case 'user_products.html':
                 loadProducts();
                 break;
+            // In your DOMContentLoaded event listener switch statement
             case 'user_products1.html':
                 const storedProductId = localStorage.getItem('selectedProductId');
                 if (storedProductId) {
-                    // Clear the stored ID
-                    localStorage.removeItem('selectedProductId');
-                    // Proceed with purchase
-                    fetch(`/api/products/purchase/${storedProductId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
+                    // Get product details and populate the form
+                    fetch(`/api/products/${storedProductId}`)
                         .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                showAlert('success', 'Purchase successful!');
-                            } else {
-                                showAlert('error', data.message || 'Purchase failed');
-                            }
+                        .then(product => {
+                            document.getElementById('productId').value = product.id;
+                            document.getElementById('productName').value = product.name;
+                            document.getElementById('productDesc').value = product.description;
+                            document.getElementById('productPrice').value = product.price;
                         })
                         .catch(error => {
-                            console.error('Error purchasing product:', error);
-                            showAlert('error', 'Error occurred while purchasing product');
+                            console.error('Error loading product details:', error);
+                            showAlert('error', 'Error loading product details');
                         });
+                } else {
+                    // Redirect back to products page if no product ID is stored
+                    window.location.href = 'user_products.html';
                 }
                 break;
         }
 
     });
 
+window.purchaseProduct = purchaseProduct;

@@ -321,7 +321,7 @@
 
 .submit-btn {
     padding: 1rem 2rem;
-    background-color: #24f0c9;
+    background-color: #1011d7;
     color: white;
     border: none;
     border-radius: 4px;
@@ -331,7 +331,7 @@
 }
 
 .submit-btn:hover {
-    background-color: #1cd1ae;
+    background-color: #007bff;
 }
 
 /* Payment Form Field Styles */
