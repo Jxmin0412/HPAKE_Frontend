@@ -199,50 +199,7 @@ async function purchaseProduct(productId) {
         showAlert('error', 'Error occurred while purchasing product');
     }
 }
-async function loadUserCart() {
-    const cartTable = document.getElementById('cartTable');
-    if (!cartTable) return;
 
-    try {
-        const response = await fetch('/api/cart/items');
-        if (!response.ok) throw new Error('Failed to fetch cart items');
-
-        const cartItems = await response.json();
-        cartTable.innerHTML = ''; // Clear existing content
-
-        if (cartItems.length === 0) {
-            cartTable.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center">Your cart is empty</td>
-                </tr>`;
-            return;
-        }
-
-        cartItems.forEach(item => {
-            const row = document.createElement('tr');
-            const imageSrc = item.imageBase64
-                ? `data:image/jpeg;base64,${item.imageBase64}`
-                : '';
-
-            row.innerHTML = `
-                <td>${item.id}</td>
-                <td>
-                    ${imageSrc ?
-                `<img src="${imageSrc}" alt="${item.name}" 
-                            class="product-image" style="max-width: 100px;">` :
-                'No Image'}
-                </td>
-                <td>${item.name}</td>
-                <td>${item.quantity}</td>
-                <td>$${item.totalCost.toFixed(2)}</td>
-            `;
-            cartTable.appendChild(row);
-        });
-    } catch (error) {
-        console.error('Error:', error);
-        showAlert('error', 'Failed to load cart items');
-    }
-}
 async function handleStoredProduct() {
     // Get data from URL parameters first
     const urlParams = new URLSearchParams(window.location.search);
@@ -351,29 +308,6 @@ async function handleStoredProduct() {
         console.error('Error loading product details:', error);
         showAlert('error', 'Error loading product details');
         window.location.href = 'user_products.html';
-    }
-    if (data.success) {
-        try {
-            await fetch('/api/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    productId: product.id,
-                    quantity: quantity,
-                    totalCost: product.price * quantity
-                })
-            });
-
-            showAlert('success', 'Purchase successful! Added to cart.');
-            setTimeout(() => {
-                window.location.href = 'user_cart.html';
-            }, 1500);
-        } catch (error) {
-            console.error('Error:', error);
-            showAlert('error', 'Failed to add item to cart');
-        }
     }
 
 }
