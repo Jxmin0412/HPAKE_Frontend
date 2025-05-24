@@ -292,7 +292,7 @@ async function handleStoredProduct() {
                         localStorage.removeItem('selectedProductId');
                         // Redirect after successful purchase
                         setTimeout(() => {
-                            window.location.href = 'user_cart.html';
+                            window.location.href = 'user_card.html';
                         }, 1500);
                     } else {
                         showAlert('error', data.message || 'Purchase failed');

@@ -27,7 +27,9 @@
         </div>
         <div class="animated-wave"></div>
     </header>
-
+    <!-- Add these divs right after your header -->
+    <div id="alertSuccess" class="alert alert-success" style="display: none;"></div>
+    <div id="alertDanger" class="alert alert-danger" style="display: none;"></div>
     <main class="users-container">
         <h2 class="page-title">View User Details</h2>
         <table class="users-table">
@@ -38,7 +40,6 @@
                     <th>DOB</th>
                     <th>Mobile No</th>
                     <th>Email</th>
-                    <th>Address</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -76,63 +77,112 @@
             <p class="copyright">© 2025 Password-Authenticated Key Exchange. All rights reserved.</p>
         </div>
     </footer>
+
     <script>
-    // Sample user data (replace with actual data fetching)
-    const users = [
-        {
-            username: "John Doe",
-            gender: "Male",
-            dob: "1990-01-01",
-            mobile: "1234567890",
-            email: "john@example.com",
-            address: "123 Main St",
-            status: "Active"
-        },
-        {
-            username: "Jane Smith",
-            gender: "Female",
-            dob: "1992-05-15",
-            mobile: "9876543210",
-            email: "jane@example.com",
-            address: "456 Oak Ave",
-            status: "Blocked"
+        // Function to load and display users
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const users = await response.json();
+
+                const tableBody = document.getElementById('usersTableBody');
+                if (!tableBody) {
+                    console.error('Users table body not found');
+                    return;
+                }
+
+                tableBody.innerHTML = '';
+
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.username || 'N/A'}</td>
+                        <td>${user.gender || 'N/A'}</td>
+                        <td>${user.dateOfBirth || 'N/A'}</td>
+                        <td>${user.mobile || 'N/A'}</td>
+                        <td>${user.email || 'N/A'}</td>
+                        <td>
+                            <span class="status-badge ${getStatusClass(user.userType)}">
+                                ${user.userType || 'Active'}
+                            </span>
+                        </td>
+                        <td>
+                            <button onclick="toggleUserBlock('${user.email}')"
+                                    class="block-btn ${user.userType === 'Blocked' ? 'unblock' : 'block'}">
+                                ${user.userType === 'Blocked' ? 'Unblock' : 'Block'}
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showAlert('error', 'Failed to load users');
+            }
         }
-    ];
 
-    function populateUsersTable() {
-        const tableBody = document.getElementById('usersTableBody');
-        tableBody.innerHTML = ''; // Clear existing content
-        
-        users.forEach(user => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${user.username}</td>
-                <td>${user.gender}</td>
-                <td>${user.dob}</td>
-                <td>${user.mobile}</td>
-                <td>${user.email}</td>
-                <td>${user.address}</td>
-                <td><span class="status-badge ${user.status.toLowerCase() === 'active' ? 'status-active' : 'status-blocked'}">${user.status}</span></td>
-                <td>
-                    <a href="#" class="block-btn" onclick="blockUser('${user.email}')">
-                        ${user.status === 'Active' ? 'Block' : 'Unblock'}
-                    </a>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-    }
+        // Function to toggle user block status
+        async function toggleUserBlock(email) {
+            try {
+                const response = await fetch(`/api/admin/users/${encodeURIComponent(email)}/block`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-    function blockUser(email) {
-        // Find user and toggle status
-        const user = users.find(u => u.email === email);
-        if (user) {
-            user.status = user.status === 'Active' ? 'Blocked' : 'Active';
-            populateUsersTable(); // Refresh table
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    showAlert('success', 'User status updated successfully');
+                    loadUsers(); // Reload the table
+                } else {
+                    showAlert('error', data.message || 'Failed to update user status');
+                }
+            } catch (error) {
+                console.error('Error updating user status:', error);
+                showAlert('error', 'Failed to update user status: ' + error.message);
+            }
         }
-    }
+        // Helper function to get status badge class
+        function getStatusClass(userType) {
+            if (!userType) return 'status-active';
 
-    document.addEventListener('DOMContentLoaded', populateUsersTable);
-</script>
+            switch(userType.toLowerCase()) {
+                case 'active':
+                    return 'status-active';
+                case 'blocked':
+                    return 'status-blocked';
+                case 'malicious':
+                    return 'status-malicious';
+                default:
+                    return 'status-active';
+            }
+        }
+
+        // Show alert function
+        function showAlert(type, message) {
+            const alertId = type === 'success' ? 'alertSuccess' : 'alertDanger';
+            const alertElement = document.getElementById(alertId);
+
+            if (alertElement) {
+                alertElement.textContent = message;
+                alertElement.style.display = 'block';
+
+                setTimeout(() => {
+                    alertElement.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', loadUsers);
+    </script>
 </body>
 </html>
